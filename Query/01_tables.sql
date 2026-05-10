@@ -23,7 +23,10 @@ CREATE TABLE Bus (
         REFERENCES Operator (operator_id)
         ON DELETE CASCADE
 );
- 
+
+ALTER TABLE Bus 
+MODIFY bus_no VARCHAR(20) NOT NULL UNIQUE; 
+
 
 -- TABLE 3: Route
 
