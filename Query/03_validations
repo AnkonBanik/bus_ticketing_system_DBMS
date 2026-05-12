@@ -1,0 +1,51 @@
+-- Check Duplicated Seat Bookings
+SELECT schedule_id, seat_no, COUNT(*)
+FROM Ticket
+GROUP BY schedule_id, seat_no
+HAVING COUNT(*) > 1;
+
+-- Check Overbook schedule
+SELECT s.schedule_id, b.total_seats, COUNT(t.ticket_id) booked
+FROM Schedule s
+JOIN Bus b ON s.bus_id = b.bus_id
+LEFT JOIN Ticket t ON s.schedule_id = t.schedule_id
+GROUP BY s.schedule_id, b.total_seats
+HAVING booked > b.total_seats;
+
+-- Check Payment Mismatch availability
+SELECT t.ticket_id, s.fare, p.amount
+FROM Ticket t
+JOIN Schedule s ON t.schedule_id = s.schedule_id
+JOIN Payment p ON t.ticket_id = p.ticket_id
+WHERE p.amount <> s.fare
+AND t.status='Confirmed';
+
+-- Check Cancel Ticket with Non-zero Payment
+SELECT *
+FROM Ticket t
+JOIN Payment p ON t.ticket_id=p.ticket_id
+WHERE t.status='Cancelled'
+AND p.amount > 0;
+
+
+-- Check Invaild Schedule Time
+SELECT *
+FROM Schedule
+WHERE arrival_time <= departure_time;
+
+
+-- Check Buses assigned to invalid operators
+
+SELECT *
+FROM Bus
+WHERE operator_id NOT IN (
+    SELECT operator_id FROM Operator
+);
+
+-- Check Passengers without booking
+
+SELECT *
+FROM Passenger
+WHERE passenger_id NOT IN (
+    SELECT passenger_id FROM Ticket
+);
